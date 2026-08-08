@@ -1,0 +1,6 @@
+pmaports/
+output/
+.local/
+__pycache__/
+*.img
+*.tar.gz

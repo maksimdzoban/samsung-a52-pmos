@@ -1,0 +1,61 @@
+name: Build postmarketOS for Samsung Galaxy A52 (samsung-a52q)
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install dependencies & pmbootstrap
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3-pip git openssl
+          pip3 install --user pmbootstrap
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+      - name: Setup pmaports with samsung-a52q restored packages
+        run: |
+          export PATH="$HOME/.local/bin:$PATH"
+          if [ ! -d "pmaports" ]; then
+            git clone https://gitlab.com/postmarketOS/pmaports.git pmaports
+          fi
+          cp -r restored_packages/device-samsung-a52q pmaports/device/testing/
+          cp -r restored_packages/firmware-samsung-a52q pmaports/device/testing/
+          cp -r restored_packages/alsa-ucm-conf-samsung-sm7125 pmaports/device/testing/
+
+      - name: Initialize pmbootstrap
+        run: |
+          export PATH="$HOME/.local/bin:$PATH"
+          pmbootstrap init --device=samsung-a52q --ui=phosh --aports="$(pwd)/pmaports"
+
+      - name: Build device package & kernel
+        run: |
+          export PATH="$HOME/.local/bin:$PATH"
+          pmbootstrap build device-samsung-a52q --force
+
+      - name: Build postmarketOS rootfs image
+        run: |
+          export PATH="$HOME/.local/bin:$PATH"
+          pmbootstrap install
+
+      - name: Export build artifacts
+        run: |
+          export PATH="$HOME/.local/bin:$PATH"
+          mkdir -p output
+          pmbootstrap export "$(pwd)/output"
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: postmarketOS-samsung-a52q
+          path: output/*
