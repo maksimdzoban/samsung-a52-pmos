@@ -40,12 +40,11 @@ jobs:
         run: |
           export PATH="$HOME/.local/bin:$PATH"
           mkdir -p ~/.config
-          printf "\n\n\n\n" | pmbootstrap init || true
+          printf "\n\n\n\n\n\n\n\n\n\n" | pmbootstrap init || true
           pmbootstrap config aports "$(pwd)/pmaports"
-          pmbootstrap config channel edge
           pmbootstrap config device samsung-a52q
           pmbootstrap config ui phosh
-          pmbootstrap config init_system openrc
+          pmbootstrap config service_manager openrc
 
       - name: Build device package & kernel
         run: |
