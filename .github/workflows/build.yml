@@ -46,10 +46,13 @@ jobs:
           pmbootstrap config ui phosh
           pmbootstrap config service_manager openrc
 
-      - name: Build device package & kernel
+      - name: Build all samsung-a52q packages & generate index
         run: |
           export PATH="$HOME/.local/bin:$PATH"
+          pmbootstrap build firmware-samsung-a52q --force || true
+          pmbootstrap build alsa-ucm-conf-samsung-sm7125 --force || true
           pmbootstrap build device-samsung-a52q --force
+          pmbootstrap index
 
       - name: Build postmarketOS rootfs image
         run: |
