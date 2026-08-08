@@ -13,30 +13,26 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          submodules: recursive
 
       - name: Install dependencies & pmbootstrap
         run: |
           sudo apt-get update
-          sudo apt-get install -y python3-pip git openssl
-          pip3 install --user pmbootstrap
+          sudo apt-get install -y python3-pip python3-setuptools git openssl
+          pip3 install --user --break-system-packages pmbootstrap || pip3 install --user pmbootstrap
           echo "$HOME/.local/bin" >> $GITHUB_PATH
 
       - name: Setup pmaports with samsung-a52q restored packages
         run: |
           export PATH="$HOME/.local/bin:$PATH"
-          if [ ! -d "pmaports" ]; then
-            git clone https://gitlab.com/postmarketOS/pmaports.git pmaports
-          fi
+          git clone --depth 1 https://gitlab.com/postmarketOS/pmaports.git pmaports
           cp -r restored_packages/device-samsung-a52q pmaports/device/testing/
           cp -r restored_packages/firmware-samsung-a52q pmaports/device/testing/
           cp -r restored_packages/alsa-ucm-conf-samsung-sm7125 pmaports/device/testing/
 
-      - name: Initialize pmbootstrap
+      - name: Initialize pmbootstrap non-interactively
         run: |
           export PATH="$HOME/.local/bin:$PATH"
-          pmbootstrap init --device=samsung-a52q --ui=phosh --aports="$(pwd)/pmaports"
+          pmbootstrap --config-version 3 init --non-interactive --device=samsung-a52q --ui=phosh --aports="$(pwd)/pmaports" || pmbootstrap init --non-interactive --device=samsung-a52q --ui=phosh --aports="$(pwd)/pmaports"
 
       - name: Build device package & kernel
         run: |
@@ -46,7 +42,7 @@ jobs:
       - name: Build postmarketOS rootfs image
         run: |
           export PATH="$HOME/.local/bin:$PATH"
-          pmbootstrap install
+          pmbootstrap --non-interactive install --password=1234
 
       - name: Export build artifacts
         run: |
