@@ -23,7 +23,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y python3-pip python3-setuptools git openssl sudo
-          git clone --depth 1 https://gitlab.com/postmarketOS/pmbootstrap.git ~/.local/pmbootstrap
+          git clone --depth 1 https://gitlab.postmarketos.org/postmarketOS/pmbootstrap.git ~/.local/pmbootstrap
           mkdir -p ~/.local/bin
           ln -s ~/.local/pmbootstrap/pmbootstrap.py ~/.local/bin/pmbootstrap
           echo "$HOME/.local/bin" >> $GITHUB_PATH
@@ -31,7 +31,7 @@ jobs:
       - name: Setup pmaports with samsung-a52q restored packages
         run: |
           export PATH="$HOME/.local/bin:$PATH"
-          git clone --depth 1 https://gitlab.com/postmarketOS/pmaports.git pmaports
+          git clone --depth 1 https://gitlab.postmarketos.org/postmarketOS/pmaports.git pmaports
           cp -r restored_packages/device-samsung-a52q pmaports/device/testing/
           cp -r restored_packages/firmware-samsung-a52q pmaports/device/testing/
           cp -r restored_packages/alsa-ucm-conf-samsung-sm7125 pmaports/device/testing/
