@@ -14,10 +14,15 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Free disk space on runner
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc
+          df -h
+
       - name: Install dependencies & pmbootstrap
         run: |
           sudo apt-get update
-          sudo apt-get install -y python3-pip python3-setuptools git openssl
+          sudo apt-get install -y python3-pip python3-setuptools git openssl sudo
           pip3 install --user --break-system-packages pmbootstrap || pip3 install --user pmbootstrap
           echo "$HOME/.local/bin" >> $GITHUB_PATH
 
@@ -32,7 +37,7 @@ jobs:
       - name: Initialize pmbootstrap non-interactively
         run: |
           export PATH="$HOME/.local/bin:$PATH"
-          pmbootstrap --config-version 3 init --non-interactive --device=samsung-a52q --ui=phosh --aports="$(pwd)/pmaports" || pmbootstrap init --non-interactive --device=samsung-a52q --ui=phosh --aports="$(pwd)/pmaports"
+          pmbootstrap init --non-interactive --device=samsung-a52q --ui=phosh --aports="$(pwd)/pmaports"
 
       - name: Build device package & kernel
         run: |
@@ -42,7 +47,7 @@ jobs:
       - name: Build postmarketOS rootfs image
         run: |
           export PATH="$HOME/.local/bin:$PATH"
-          pmbootstrap --non-interactive install --password=1234
+          pmbootstrap --non-interactive install --on-device-installer --no-fsi
 
       - name: Export build artifacts
         run: |
