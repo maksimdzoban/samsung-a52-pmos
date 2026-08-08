@@ -39,10 +39,11 @@ jobs:
       - name: Initialize pmbootstrap non-interactively
         run: |
           export PATH="$HOME/.local/bin:$PATH"
-          pmbootstrap -y init
-          pmbootstrap config target_device samsung-a52q || pmbootstrap config device samsung-a52q
-          pmbootstrap config ui phosh
+          mkdir -p ~/.config
+          printf "\n\n\n\n" | pmbootstrap init || true
           pmbootstrap config aports "$(pwd)/pmaports"
+          pmbootstrap config device samsung-a52q
+          pmbootstrap config ui phosh
 
       - name: Build device package & kernel
         run: |
@@ -52,7 +53,7 @@ jobs:
       - name: Build postmarketOS rootfs image
         run: |
           export PATH="$HOME/.local/bin:$PATH"
-          pmbootstrap -y install --on-device-installer --no-fsi || pmbootstrap -y install --password=1234
+          printf "1234\n1234\n" | pmbootstrap install || pmbootstrap install --password=1234
 
       - name: Export build artifacts
         run: |
